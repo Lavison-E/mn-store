@@ -417,6 +417,27 @@ footer a:hover{color:var(--or-clair)}
   .chiffres strong{font-size:1.6rem}
   .bot{right:12px;bottom:12px}
 }
+
+/* ===== Film MN ===== */
+.film{background:radial-gradient(circle at 75% 40%,#2a2215 0%,#0c0c0c 60%);color:var(--creme);position:relative;overflow:hidden}
+.film-grille{display:grid;grid-template-columns:1.1fr .9fr;gap:4rem;align-items:center}
+.film h2{margin:.8rem 0 1.2rem;color:var(--creme)}
+.film p{color:#c9c0b0;font-weight:300;max-width:30rem}
+.btn-or{background:var(--or);color:var(--noir)}
+.btn-or:hover{background:var(--or-clair)}
+.btn-clair{border:1px solid rgba(255,255,255,.35);color:var(--creme)}
+.btn-clair:hover{background:var(--creme);color:var(--noir)}
+.telephone{justify-self:center;width:min(330px,78vw);aspect-ratio:9/19;border-radius:46px;padding:12px;background:linear-gradient(145deg,#2c2a26,#0a0a0a);box-shadow:0 0 0 2px rgba(201,162,74,.45),0 50px 90px -30px rgba(0,0,0,.8),0 0 120px -20px rgba(201,162,74,.35);position:relative}
+.telephone::before{content:"";position:absolute;top:22px;left:50%;transform:translateX(-50%);width:90px;height:22px;border-radius:999px;background:#000;z-index:2}
+.ecran{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:#000}
+.ecran video{width:100%;height:100%;object-fit:cover;display:block}
+.son{position:absolute;right:14px;bottom:14px;width:46px;height:46px;border-radius:50%;background:rgba(12,12,12,.65);backdrop-filter:blur(6px);color:#fff;display:grid;place-items:center;border:1px solid rgba(255,255,255,.2)}
+.son svg{width:20px;height:20px}
+@media (max-width:860px){
+  .film-grille{grid-template-columns:1fr;gap:2.6rem;text-align:center}
+  .film p{margin:0 auto}
+  .film .ctas{justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -529,7 +550,27 @@ footer a:hover{color:var(--or-clair)}
     </div>
   </section>
 
-  <section class="section" style="padding-top:0">
+  <section class="section film">
+    <div class="wrap film-grille">
+      <div class="revele film-txt">
+        <span class="eyebrow">MN STORE en mouvement</span>
+        <h2>Entrez dans <em>l'univers MN</em></h2>
+        <p>Prêt-à-porter, lingerie, parfums de marque : 30 secondes pour découvrir l'élégance MN STORE, comme si vous étiez au showroom d'Angré.</p>
+        <div class="ctas">
+          <a href="/boutique" data-link class="btn btn-or">Découvrir la boutique <svg><use href="#i-fleche"/></svg></a>
+          <a href="https://www.tiktok.com/@mn.store.abidjan.o" target="_blank" rel="noopener" class="btn btn-clair"><svg><use href="#i-tt"/></svg>Suivre sur TikTok</a>
+        </div>
+      </div>
+      <div class="revele telephone">
+        <div class="ecran">
+          <video id="filmMN" src="/media/mn-store.mp4" poster="/media/mn-store-poster.jpg" muted loop playsinline preload="metadata" aria-label="Vidéo de présentation MN STORE"></video>
+          <button class="son" id="sonFilm" aria-label="Lecture ou pause"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="wrap">
       <div class="tete revele">
         <div><span class="eyebrow">Nos univers</span><h2>Trois univers, <em>une seule exigence</em></h2></div>
@@ -1135,6 +1176,21 @@ function repondre(brut, instant){
   }
   if(brut==="pret") r = [txt("Voici notre prêt-à-porter du moment 👗"), cartes(produits.filter(p=>p.cat==="Prêt-à-porter")), boutons([btnNav("Toute la boutique","/boutique?univers=pret-a-porter")])];
   botDit(r, instant);
+}
+
+
+/* ---------- Film MN : lecture auto quand visible ---------- */
+const film = document.getElementById("filmMN"), btnFilm = document.getElementById("sonFilm");
+const icoPlay = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const icoPause = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+let pauseManuelle = false;
+function majBtn(){ btnFilm.innerHTML = film.paused ? icoPlay : icoPause; }
+film.addEventListener("play", majBtn); film.addEventListener("pause", majBtn);
+btnFilm.onclick = () => { if(film.paused){ pauseManuelle=false; film.play().catch(()=>{}); } else { pauseManuelle=true; film.pause(); } };
+if("IntersectionObserver" in window){
+  new IntersectionObserver(es => es.forEach(e => {
+    if(e.isIntersecting && !pauseManuelle) film.play().catch(()=>{}); else if(!e.isIntersecting) film.pause();
+  }), {threshold:.35}).observe(film);
 }
 
 /* ---------- Démarrage ---------- */
